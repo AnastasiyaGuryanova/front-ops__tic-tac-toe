@@ -11,20 +11,14 @@ services:
     image: certbot/certbot
     volumes:
       - ./nginx/ssl:/etc/letsencrypt
-    command: certonly --webroot --webroot-path=/usr/share/nginx/html -d your-domain.timeweb.cloud --email your-email@example.com --agree-tos --non-interactive
+    command: certonly --webroot --webroot-path=/usr/share/nginx/html -d anagur.ru --email anastasia.gurianova.dev@mail.ru --agree-tos --non-interactive
     depends_on:
       - nginx
 
-certbot-renew:
-  image: certbot/certbot
-  volumes:
-    - ./nginx/ssl:/etc/letsencrypt
-  command: renew
-  deploy:
-    mode: replicated
-    replicas: 1
-    restart_policy:
-      condition: none
-  entrypoint: "/bin/sh -c 'certbot renew && sleep 604800 && certbot renew'"
-  depends_on:
-    - nginx
+  certbot-renew:
+    image: certbot/certbot
+    volumes:
+      - ./nginx/ssl:/etc/letsencrypt
+    entrypoint: '/bin/sh -c ''echo "0 0 * * * certbot renew" | crontab - && crond -f'''
+    depends_on:
+      - nginx
